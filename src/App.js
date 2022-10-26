@@ -12,21 +12,21 @@ function App() {
       created_date: new Date().getTime(), // 이렇게 선언하면 현재시간을 반환, getTime -> 밀리세컨드로 변환
     },
     {
-      id: 1,
+      id: 2,
       author: "김진희",
       content: "하이w",
       emotion: 5,
       created_date: new Date().getTime(),
     },
     {
-      id: 1,
+      id: 3,
       author: "김진희",
       content: "하이e",
       emotion: 3,
       created_date: new Date().getTime(),
     },
     {
-      id: 1,
+      id: 4,
       author: "sisi",
       content: "하이3",
       emotion: 2,
