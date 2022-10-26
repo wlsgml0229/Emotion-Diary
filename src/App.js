@@ -33,7 +33,7 @@ function App() {
       created_date: new Date().getTime(),
     },
   ];
-
+  console.log(dummyList);
   return (
     <div className="App">
       <DiaryEditor></DiaryEditor>
