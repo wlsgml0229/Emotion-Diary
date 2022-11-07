@@ -42,6 +42,7 @@ function App() {
       created_date,
       id: dataId.current,
     };
+    console.log(newItem);
     dataId.current += 1;
     setData([...data, newItem]);
   };
@@ -51,10 +52,23 @@ function App() {
     const newDiaryList = data.filter((it) => it.id !== targetId);
     setData(newDiaryList);
   };
+
+  //타겟 아이디와 일치하는 아이디의 내용을 새로운 내용으로 수정 아닌것은 그냥 반환
+  const onEdit = (targetId, newContent) => {
+    setData(
+      data.map((it) =>
+        it.id === targetId ? { ...it, content: newContent } : it
+      )
+    );
+  };
   return (
     <div className="App">
       <DiaryEditor onCreate={onCreate} />
-      <DiaryList onRemove={onRemove} diaryList={data}></DiaryList>
+      <DiaryList
+        onEdit={onEdit}
+        onRemove={onRemove}
+        diaryList={data}
+      ></DiaryList>
     </div>
   );
 }
