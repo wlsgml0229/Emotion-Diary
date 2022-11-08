@@ -42,26 +42,26 @@ function App() {
       created_date,
       id: dataId.current,
     };
-    console.log(newItem);
     dataId.current += 1;
     //함수형 업데이트 -> 그대로 데이터값을 참고해서 새로운 배열 반환 했을때는 메모이제이션되면서 빈상태로 멈춰있기때문에 아래와같이 기능할수있도록 변경
-    setData((data) => [...data, newItem]);
+    setData((data) => [newItem, ...data]);
   }, []);
 
-  const onRemove = (targetId) => {
+  const onRemove = useCallback((targetId) => {
     console.log(`${targetId} 가 삭제되었습니다.`);
-    const newDiaryList = data.filter((it) => it.id !== targetId);
-    setData(newDiaryList);
-  };
+    // 아래내용을 지우고 setData 에 직접적으로 변경될 data를 받아와서 삭제를 진행시킨다.
+    // const newDiaryList = data.filter((it) => it.id !== targetId);
+    setData((data) => data.filter((it) => it.id !== targetId));
+  }, []);
 
   //타겟 아이디와 일치하는 아이디의 내용을 새로운 내용으로 수정 아닌것은 그냥 반환
-  const onEdit = (targetId, newContent) => {
-    setData(
+  const onEdit = useCallback((targetId, newContent) => {
+    setData((data) =>
       data.map((it) =>
         it.id === targetId ? { ...it, content: newContent } : it
       )
     );
-  };
+  }, []);
 
   // 일기 감정점수에 따른 갯수를 구해주는 함수
   const getDiaryAnalysis = useMemo(() => {
