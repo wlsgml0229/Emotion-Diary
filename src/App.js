@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import "./App.css";
 import DiaryEditor from "./DiaryEditor";
 import DiaryList from "./DiaryList";
@@ -33,7 +33,7 @@ function App() {
     getData();
   }, []);
 
-  const onCreate = (author, content, emotion) => {
+  const onCreate = useCallback((author, content, emotion) => {
     const created_date = new Date().getTime();
     const newItem = {
       author,
@@ -44,8 +44,9 @@ function App() {
     };
     console.log(newItem);
     dataId.current += 1;
-    setData([...data, newItem]);
-  };
+    //함수형 업데이트 -> 그대로 데이터값을 참고해서 새로운 배열 반환 했을때는 메모이제이션되면서 빈상태로 멈춰있기때문에 아래와같이 기능할수있도록 변경
+    setData((data) => [...data, newItem]);
+  }, []);
 
   const onRemove = (targetId) => {
     console.log(`${targetId} 가 삭제되었습니다.`);

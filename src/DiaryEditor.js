@@ -1,6 +1,10 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 const DiaryEditor = ({ onCreate }) => {
+  useEffect(() => {
+    console.log("Diary 에디터 렌더");
+  });
+
   const authorInput = useRef();
   const contentInput = useRef();
   const [state, setState] = useState({
@@ -75,4 +79,5 @@ const DiaryEditor = ({ onCreate }) => {
   );
 };
 
-export default DiaryEditor;
+// 컴포넌트에 전체를 묶은것과 같은 기능을 한다.
+export default React.memo(DiaryEditor);
