@@ -1,10 +1,36 @@
-import { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import { useEffect, useRef, useMemo, useCallback, useReducer } from "react";
 import "./App.css";
 import DiaryEditor from "./DiaryEditor";
 import DiaryList from "./DiaryList";
 
 function App() {
-  const [data, setData] = useState([]);
+  //2개의 파라미터 받음 (상태변화일어나기직전의 state, 어떤정보로 상태를변화시킬지)
+  //리턴하는 값으로 상태가변화됨
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case "INIT":
+        return action.data;
+      case "CREATE": {
+        const created_date = new Date().getTime();
+        const newItem = { ...action.data, created_date };
+        // 새로운아이템을 원래의 배열에 붙여서 return
+        return [newItem, ...state];
+      }
+      case "REMOVE": {
+        return state.filter((it) => it.id !== action.targetId);
+      }
+      case "EDIT": {
+        return state.map((it) =>
+          it.id === action.targetId ? { ...it, content: action.newContent } : it
+        );
+      }
+      default:
+        return state;
+    }
+  };
+  // data 를 useReducer로 관리하게 변경 (상태변화함수, 데이터 state의 초기값)
+  // const [data, setData] = useState([]);
+  const [data, dispatch] = useReducer(reducer, []);
 
   const dataId = useRef(0);
 
@@ -25,7 +51,7 @@ function App() {
         id: dataId.current++,
       };
     });
-    setData(initData);
+    dispatch({ type: "INIT", data: initData });
   };
 
   //app 컴포넌트가 마운트 됐을때 getData호출
@@ -34,33 +60,25 @@ function App() {
   }, []);
 
   const onCreate = useCallback((author, content, emotion) => {
-    const created_date = new Date().getTime();
-    const newItem = {
-      author,
-      content,
-      emotion,
-      created_date,
-      id: dataId.current,
-    };
+    // 아이템 데이터만 담아서 보냄 created_data 뺴고
+    dispatch({
+      type: "CREATE",
+      data: { author, content, emotion, id: dataId.current },
+    });
     dataId.current += 1;
     //함수형 업데이트 -> 그대로 데이터값을 참고해서 새로운 배열 반환 했을때는 메모이제이션되면서 빈상태로 멈춰있기때문에 아래와같이 기능할수있도록 변경
-    setData((data) => [newItem, ...data]);
   }, []);
 
   const onRemove = useCallback((targetId) => {
     console.log(`${targetId} 가 삭제되었습니다.`);
     // 아래내용을 지우고 setData 에 직접적으로 변경될 data를 받아와서 삭제를 진행시킨다.
     // const newDiaryList = data.filter((it) => it.id !== targetId);
-    setData((data) => data.filter((it) => it.id !== targetId));
+    dispatch({ type: "DELETE", targetId });
   }, []);
 
   //타겟 아이디와 일치하는 아이디의 내용을 새로운 내용으로 수정 아닌것은 그냥 반환
   const onEdit = useCallback((targetId, newContent) => {
-    setData((data) =>
-      data.map((it) =>
-        it.id === targetId ? { ...it, content: newContent } : it
-      )
-    );
+    dispatch({ type: "EDIT", targetId, newContent });
   }, []);
 
   // 일기 감정점수에 따른 갯수를 구해주는 함수
